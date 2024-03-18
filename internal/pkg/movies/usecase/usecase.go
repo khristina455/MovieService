@@ -4,6 +4,7 @@ import (
 	"MovieService/internal/models"
 	"MovieService/internal/pkg/movies"
 	"context"
+	"fmt"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -23,10 +24,19 @@ func (mu MoviesUsecase) GetMovies(ctx context.Context, sortType string) ([]model
 }
 
 func (mu MoviesUsecase) AddMovie(ctx context.Context, movie *models.Movie) error {
-	err := mu.repo.CreateMovie(ctx, movie)
+	movieId, err := mu.repo.CreateMovie(ctx, movie)
 	if err != nil {
 		return err
 	}
+
+	fmt.Println(movieId)
+	for _, actor := range movie.Actors {
+		err = mu.repo.AddActorToMovie(ctx, movieId, actor.Id)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 

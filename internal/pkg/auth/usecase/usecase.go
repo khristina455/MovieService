@@ -16,10 +16,11 @@ func NewAuthUsecase(repo auth.AuthRepo) *AuthUsecase {
 	}
 }
 
-func (ac *AuthUsecase) SignIn(ctx context.Context, user *models.User) error {
-	return nil
+func (au *AuthUsecase) SignIn(ctx context.Context, user *models.User) error {
+	u, err := au.repo.GetUserByLogin()
 }
 
-func (ac *AuthUsecase) SignUp(ctx context.Context, user *models.User) error {
-	return nil
+func (au *AuthUsecase) SignUp(ctx context.Context, user *models.User) (int, error) {
+	id, err := au.repo.CreateUser(ctx, user)
+	return id, err
 }

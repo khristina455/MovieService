@@ -17,10 +17,11 @@ const (
 type MoviesRepo interface {
 	ReadMovies(context.Context, string) ([]models.Movie, error)
 	ReadMovie(context.Context, int) (*models.Movie, error)
-	CreateMovie(context.Context, *models.Movie) error
+	CreateMovie(context.Context, *models.Movie) (int, error)
 	UpdateMovie(context.Context, *models.Movie) error
 	DeleteMovie(context.Context, int) error
 	ReadMoviesBySearch(context.Context, string, string) ([]models.Movie, error)
+	AddActorToMovie(context.Context, int, int) error
 }
 
 type MoviesUsecase interface {

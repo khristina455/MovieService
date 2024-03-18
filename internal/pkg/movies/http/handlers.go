@@ -34,6 +34,7 @@ func NewMoviesHandler(log *slog.Logger, uc movies.MoviesUsecase) MoviesHandler {
 	}
 }
 
+// TODO разделить поиск по названию и актеру
 func (mh *MoviesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	fmt.Println(r.URL.RequestURI())
@@ -103,6 +104,7 @@ func (mh *MoviesHandler) AddMovie(w http.ResponseWriter, r *http.Request) {
 
 	err = mh.uc.AddMovie(r.Context(), m)
 	if err != nil {
+		fmt.Println(err)
 		resp.JSONStatus(w, http.StatusInternalServerError)
 		return
 	}

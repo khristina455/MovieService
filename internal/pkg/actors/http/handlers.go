@@ -3,6 +3,7 @@ package http
 import (
 	"MovieService/internal/models"
 	"MovieService/internal/pkg/actors"
+	"MovieService/internal/pkg/middleware"
 	resp "MovieService/internal/pkg/utils/responser"
 	"encoding/json"
 	"fmt"
@@ -39,23 +40,22 @@ func (ah *ActorsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(r.URL.Path)
 	switch {
 	case r.Method == http.MethodGet && allActorsRe.MatchString(r.URL.Path):
-		ah.GetActors(w, r)
+		middleware.RoleCheck(w, r, ah.GetActors, []models.Role{models.Client})
 		return
 	case r.Method == http.MethodPost && addActorRe.MatchString(r.URL.Path):
-		ah.AddActor(w, r)
+		middleware.RoleCheck(w, r, ah.AddActor, []models.Role{models.Admin})
 		return
 	case r.Method == http.MethodPut && updateActorRe.MatchString(r.URL.Path):
-		ah.UpdateActor(w, r)
+		middleware.RoleCheck(w, r, ah.UpdateActor, []models.Role{models.Admin})
 		return
 	case r.Method == http.MethodDelete && deleteActorRe.MatchString(r.URL.Path):
-		ah.DeleteActor(w, r)
+		middleware.RoleCheck(w, r, ah.DeleteActor, []models.Role{models.Admin})
 		return
 	default:
 		return
 	}
 }
 
-// TODO:возращать список фильмов у каждого актера
 func (ah *ActorsHandler) GetActors(w http.ResponseWriter, r *http.Request) {
 	actors, err := ah.uc.GetActors(r.Context())
 	fmt.Println("get actors")

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"MovieService/internal/pkg/utils/jwt"
 	"context"
 	"fmt"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -33,6 +34,8 @@ func main() {
 	}
 }
 
+var tokenManager jwt.TokenManager
+
 func run() (err error) {
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("Не удалось загрузить файл .env")
@@ -44,6 +47,7 @@ func run() (err error) {
 	dbPassword := os.Getenv("DB_PASSWORD")
 	dbPort := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_NAME")
+	secretKey := os.Getenv("SECRET_KEY")
 
 	db, err := pgxpool.New(context.Background(), fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=disable",
 		dbUser,
@@ -61,6 +65,11 @@ func run() (err error) {
 	if err = db.Ping(context.Background()); err != nil {
 		err = fmt.Errorf("error happened in db.Ping: %w", err)
 
+		return err
+	}
+
+	err = jwt.LoadSecret(secretKey)
+	if err != nil {
 		return err
 	}
 
