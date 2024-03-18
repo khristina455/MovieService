@@ -35,6 +35,6 @@ func (ar *AuthRepo) CreateUser(ctx context.Context, user *models.User) (int, err
 	return id, nil
 }
 
-func (ar *AuthRepo) GetUserByLogin(context.Context, string) *models.User {
-	return &models.User{}
+func (ar *AuthRepo) GetUserByLogin(context.Context, string) (*models.User, error) {
+	return &models.User{}, nil
 }

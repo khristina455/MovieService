@@ -7,7 +7,7 @@ import (
 
 type AuthRepo interface {
 	CreateUser(context.Context, *models.User) (int, error)
-	GetUserByLogin(context.Context, string) *models.User
+	GetUserByLogin(context.Context, string) (*models.User, error)
 }
 
 type AuthUsecase interface {
