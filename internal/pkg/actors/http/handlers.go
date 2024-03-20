@@ -51,7 +51,7 @@ func (ah *ActorsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		middleware.RoleCheck(w, r, ah.DeleteActor, []models.Role{models.Admin})
 		return
 	default:
-		return
+		resp.JSONStatus(w, http.StatusNotFound)
 	}
 }
 

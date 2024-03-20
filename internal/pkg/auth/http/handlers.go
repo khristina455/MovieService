@@ -23,8 +23,6 @@ type AuthHandler struct {
 	uc  auth.AuthUsecase
 }
 
-//Разобраться с jwt и заполнить ручкм для auth
-
 func NewAuthHandler(log *slog.Logger, uc auth.AuthUsecase) AuthHandler {
 	return AuthHandler{
 		log: log,
@@ -43,10 +41,21 @@ func (ah *AuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		ah.SignUp(w, r)
 		return
 	default:
-		return
+		resp.JSONStatus(w, http.StatusNotFound)
 	}
 }
 
+// SignIn godoc
+// @Summary      User sign-in
+// @Description  Authenticates a user and generates an access token
+// @Tags         Authentication
+// @Accept       json
+// @Produce      json
+// @Param        user  body  models.User  true  "User information"
+// @Success      200
+// @Failure      400
+// @Failure      500
+// @Router       /api/signIn [post]
 func (ah *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 
@@ -80,6 +89,17 @@ func (ah *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	resp.JSONStatus(w, http.StatusOK)
 }
 
+// SignUp godoc
+// @Summary      Sign up a new user
+// @Description  Creates a new user account
+// @Tags         Authentication
+// @Accept       json
+// @Produce      json
+// @Param        user  body  models.User  true  "User information"
+// @Success      200
+// @Failure      400
+// @Failure      500
+// @Router       /api/signUp [post]
 func (ah *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("signup")
 	body, err := io.ReadAll(r.Body)

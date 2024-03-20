@@ -30,6 +30,17 @@ definitions:
       releaseDate:
         $ref: '#/definitions/pgtype.Date'
     type: object
+  MovieService_internal_models.User:
+    properties:
+      id:
+        type: integer
+      isAdmin:
+        type: boolean
+      login:
+        type: string
+      password:
+        type: string
+    type: object
   pgtype.Date:
     properties:
       infinityModifier:
@@ -130,6 +141,54 @@ paths:
       summary: Update modeling by ID
       tags:
       - Actors
+  /api/signIn:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user and generates an access token
+      parameters:
+      - description: User information
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/MovieService_internal_models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: User sign-in
+      tags:
+      - Authentication
+  /api/signUp:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user account
+      parameters:
+      - description: User information
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/MovieService_internal_models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Sign up a new user
+      tags:
+      - Authentication
 schemes:
 - http
 swagger: "2.0"
