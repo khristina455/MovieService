@@ -81,6 +81,7 @@ func (ah *ActorsHandler) GetActors(w http.ResponseWriter, r *http.Request) {
 // @Description  Add a new actor with name, surname, gender and birthdate
 // @Tags         Actors
 // @Accept       json
+// @Param        actor  body  models.Actor  true  "Actor information"
 // @Success      200
 // @Failure      400
 // @Failure      500
@@ -108,11 +109,12 @@ func (ah *ActorsHandler) AddActor(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdateActor godoc
-// @Summary      Update modeling by ID
+// @Summary      Update actor by ID
 // @Description  Updates an actor with the given ID
 // @Tags         Actors
 // @Accept       json
 // @Param        id  path  int  true  "Actor ID"
+// @Param        actor  body  models.Actor  true  "Actor information to update"
 // @Success      200
 // @Failure      400
 // @Failure      500

@@ -17,6 +17,36 @@ definitions:
       surname:
         type: string
     type: object
+  MovieService_internal_models.ActorInMovieSlice:
+    properties:
+      birthDate:
+        $ref: '#/definitions/pgtype.Date'
+      gender:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      surname:
+        type: string
+    type: object
+  MovieService_internal_models.Movie:
+    properties:
+      actors:
+        items:
+          $ref: '#/definitions/MovieService_internal_models.ActorInMovieSlice'
+        type: array
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      rating:
+        type: integer
+      releaseDate:
+        $ref: '#/definitions/pgtype.Date'
+    type: object
   MovieService_internal_models.MovieInActorSlice:
     properties:
       description:
@@ -90,6 +120,13 @@ paths:
       consumes:
       - application/json
       description: Add a new actor with name, surname, gender and birthdate
+      parameters:
+      - description: Actor information
+        in: body
+        name: actor
+        required: true
+        schema:
+          $ref: '#/definitions/MovieService_internal_models.Actor'
       responses:
         "200":
           description: OK
@@ -131,6 +168,12 @@ paths:
         name: id
         required: true
         type: integer
+      - description: Actor information to update
+        in: body
+        name: actor
+        required: true
+        schema:
+          $ref: '#/definitions/MovieService_internal_models.Actor'
       responses:
         "200":
           description: OK
@@ -138,9 +181,181 @@ paths:
           description: Bad Request
         "500":
           description: Internal Server Error
-      summary: Update modeling by ID
+      summary: Update actor by ID
       tags:
       - Actors
+  /api/movie/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Updates a movie with the given ID
+      parameters:
+      - description: Movie ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Movie information to update
+        in: body
+        name: movie
+        required: true
+        schema:
+          $ref: '#/definitions/MovieService_internal_models.Movie'
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Update movie by ID
+      tags:
+      - Movies
+  /api/movies:
+    get:
+      description: Retrieves a list of movies based on the provided parameters
+      parameters:
+      - description: Query string to sort movies
+        in: query
+        name: sorting
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/MovieService_internal_models.Movie'
+            type: array
+        "500":
+          description: Internal Server Error
+      summary: Get list of movies
+      tags:
+      - Movies
+    post:
+      consumes:
+      - application/json
+      description: Add a new movie with name, description, release date, rating
+      parameters:
+      - description: Movie information
+        in: body
+        name: movie
+        required: true
+        schema:
+          $ref: '#/definitions/MovieService_internal_models.Movie'
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Add a new movie
+      tags:
+      - Movies
+  /api/movies/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a movie with the given ID
+      parameters:
+      - description: Movie ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Delete movie by ID
+      tags:
+      - Movies
+  /api/movies/{id}/actors:
+    post:
+      consumes:
+      - application/json
+      description: Add an actor to movie by their ids
+      parameters:
+      - description: Movie ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Actor id
+        in: body
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Add an actor to movie
+      tags:
+      - Movies
+  /api/movies/{movieId}/actors/{actorId}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete actor from movie by their ids
+      parameters:
+      - description: Movie ID
+        in: path
+        name: movieId
+        required: true
+        type: integer
+      - description: Actor id
+        in: path
+        name: actorId
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Delete actor from movie
+      tags:
+      - Movies
+  /api/movies/search:
+    get:
+      description: Retrieves a list of movies based on the provided parameters
+      parameters:
+      - description: Name of movie to filter movies
+        in: query
+        name: movie_name
+        type: string
+      - description: Name of actor to filter movies
+        in: query
+        name: actor_name
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/MovieService_internal_models.Movie'
+            type: array
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Get list of movies
+      tags:
+      - Movies
   /api/signIn:
     post:
       consumes:

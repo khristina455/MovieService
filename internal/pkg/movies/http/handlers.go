@@ -61,12 +61,21 @@ func (mh *MoviesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		mh.AddActorToMovie(w, r)
 		return
 	case r.Method == http.MethodDelete && deleteActorFromMovieRe.MatchString(r.URL.Path):
-		mh.DeleteActorToMovie(w, r)
+		mh.DeleteActorFromMovie(w, r)
 	default:
 		resp.JSONStatus(w, http.StatusNotFound)
 	}
 }
 
+// GetMovies godoc
+// @Summary      Get list of movies
+// @Description  Retrieves a list of movies based on the provided parameters
+// @Tags         Movies
+// @Produce      json
+// @Param        sorting   query    string  false  "Query string to sort movies"
+// @Success      200  {array}  models.Movie
+// @Failure      500
+// @Router       /api/movies [get]
 func (mh *MoviesHandler) GetMovies(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("get movies")
 	sort := r.URL.Query().Get("sorting")
@@ -85,18 +94,24 @@ func (mh *MoviesHandler) GetMovies(w http.ResponseWriter, r *http.Request) {
 	resp.JSON(w, http.StatusOK, movies)
 }
 
+// GetMoviesBySearch godoc
+// @Summary      Get list of movies
+// @Description  Retrieves a list of movies based on the provided parameters
+// @Tags         Movies
+// @Produce      json
+// @Param        movie_name   query    string  false  "Name of movie to filter movies"
+// @Param        actor_name   query    string  false  "Name of actor to filter movies"
+// @Success      200  {array}  models.Movie
+// @Failure      400
+// @Failure      500
+// @Router       /api/movies/search [get]
 func (mh *MoviesHandler) GetMoviesBySearch(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("get search movies")
 	movieName := r.URL.Query().Get("movie_name")
 	actorName := r.URL.Query().Get("actor_name")
 
-	if movieName != "" && actorName == "" {
-		movies, err := mh.uc.GetMoviesByMovieName(r.Context(), movieName)
-		if err != nil {
-			resp.JSONStatus(w, http.StatusInternalServerError)
-			return
-		}
-		resp.JSON(w, http.StatusOK, movies)
+	if movieName != "" && actorName != "" {
+		resp.JSONStatus(w, http.StatusBadRequest)
 	} else if movieName == "" && actorName != "" {
 		movies, err := mh.uc.GetMoviesByActorName(r.Context(), actorName)
 		fmt.Println(err)
@@ -106,10 +121,25 @@ func (mh *MoviesHandler) GetMoviesBySearch(w http.ResponseWriter, r *http.Reques
 		}
 		resp.JSON(w, http.StatusOK, movies)
 	} else {
-		resp.JSONStatus(w, http.StatusBadRequest)
+		movies, err := mh.uc.GetMoviesByMovieName(r.Context(), movieName)
+		if err != nil {
+			resp.JSONStatus(w, http.StatusInternalServerError)
+			return
+		}
+		resp.JSON(w, http.StatusOK, movies)
 	}
 }
 
+// AddMovie godoc
+// @Summary      Add a new movie
+// @Description  Add a new movie with name, description, release date, rating
+// @Tags         Movies
+// @Accept       json
+// @Param        movie  body  models.Movie  true  "Movie information"
+// @Success      200
+// @Failure      400
+// @Failure      500
+// @Router       /api/movies [post]
 func (mh *MoviesHandler) AddMovie(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("add movie")
 	body, err := io.ReadAll(r.Body)
@@ -120,6 +150,9 @@ func (mh *MoviesHandler) AddMovie(w http.ResponseWriter, r *http.Request) {
 
 	m := &models.Movie{}
 	err = json.Unmarshal(body, m)
+	if err != nil {
+		resp.JSONStatus(w, http.StatusBadRequest)
+	}
 
 	err = mh.uc.AddMovie(r.Context(), m)
 	if err != nil {
@@ -131,6 +164,17 @@ func (mh *MoviesHandler) AddMovie(w http.ResponseWriter, r *http.Request) {
 	resp.JSONStatus(w, http.StatusOK)
 }
 
+// UpdateMovie godoc
+// @Summary      Update movie by ID
+// @Description  Updates a movie with the given ID
+// @Tags         Movies
+// @Accept       json
+// @Param        id  path  int  true  "Movie ID"
+// @Param        movie  body  models.Movie  true  "Movie information to update"
+// @Success      200
+// @Failure      400
+// @Failure      500
+// @Router       /api/movie/{id} [put]
 func (mh *MoviesHandler) UpdateMovie(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("update movies")
 	idStr := filepath.Base(r.URL.Path)
@@ -160,6 +204,16 @@ func (mh *MoviesHandler) UpdateMovie(w http.ResponseWriter, r *http.Request) {
 	resp.JSONStatus(w, http.StatusOK)
 }
 
+// DeleteMovie godoc
+// @Summary      Delete movie by ID
+// @Description  Deletes a movie with the given ID
+// @Tags         Movies
+// @Accept       json
+// @Param        id  path  int  true  "Movie ID"
+// @Success      200
+// @Failure      400
+// @Failure      500
+// @Router       /api/movies/{id} [delete]
 func (mh *MoviesHandler) DeleteMovie(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("delete movies")
 	idStr := filepath.Base(r.URL.Path)
@@ -179,6 +233,19 @@ func (mh *MoviesHandler) DeleteMovie(w http.ResponseWriter, r *http.Request) {
 	resp.JSONStatus(w, http.StatusOK)
 }
 
+//Наложить ограничение уникальности на ключи в м-м
+
+// AddActorToMovie godoc
+// @Summary      Add an actor to movie
+// @Description  Add an actor to movie by their ids
+// @Tags         Movies
+// @Accept       json
+// @Param        id  path  int  true  "Movie ID"
+// @Param        id  body  int  true  "Actor id"
+// @Success      200
+// @Failure      400
+// @Failure      500
+// @Router       /api/movies/{id}/actors [post]
 func (mh *MoviesHandler) AddActorToMovie(w http.ResponseWriter, r *http.Request) {
 	sliceOfURL := strings.Split(r.URL.Path, "/")
 	id, err := strconv.Atoi(sliceOfURL[1])
@@ -210,6 +277,36 @@ func (mh *MoviesHandler) AddActorToMovie(w http.ResponseWriter, r *http.Request)
 	resp.JSONStatus(w, http.StatusOK)
 }
 
-func (mh *MoviesHandler) DeleteActorToMovie(w http.ResponseWriter, r *http.Request) {
+// DeleteActorFromMovie godoc
+// @Summary      Delete actor from movie
+// @Description  Delete actor from movie by their ids
+// @Tags         Movies
+// @Accept       json
+// @Param        movieId  path  int  true  "Movie ID"
+// @Param        actorId  path  int  true  "Actor id"
+// @Success      200
+// @Failure      400
+// @Failure      500
+// @Router       /api/movies/{movieId}/actors/{actorId} [delete]
+func (mh *MoviesHandler) DeleteActorFromMovie(w http.ResponseWriter, r *http.Request) {
+	sliceOfURL := strings.Split(r.URL.Path, "/")
+	movieId, err := strconv.Atoi(sliceOfURL[2])
+	if err != nil {
+		resp.JSONStatus(w, http.StatusBadRequest)
+		return
+	}
 
+	actorId, err := strconv.Atoi(sliceOfURL[4])
+	if err != nil {
+		resp.JSONStatus(w, http.StatusBadRequest)
+		return
+	}
+
+	err = mh.uc.DeleteActorFromMovie(r.Context(), movieId, actorId)
+	if err != nil {
+		resp.JSONStatus(w, http.StatusInternalServerError)
+		return
+	}
+
+	resp.JSONStatus(w, http.StatusOK)
 }

@@ -52,6 +52,17 @@ const docTemplate = `{
                     "Actors"
                 ],
                 "summary": "Add a new actor",
+                "parameters": [
+                    {
+                        "description": "Actor information",
+                        "name": "actor",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/MovieService_internal_models.Actor"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK"
@@ -74,7 +85,7 @@ const docTemplate = `{
                 "tags": [
                     "Actors"
                 ],
-                "summary": "Update modeling by ID",
+                "summary": "Update actor by ID",
                 "parameters": [
                     {
                         "type": "integer",
@@ -82,6 +93,15 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "Actor information to update",
+                        "name": "actor",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/MovieService_internal_models.Actor"
+                        }
                     }
                 ],
                 "responses": {
@@ -110,6 +130,268 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "Actor ID",
                         "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/movie/{id}": {
+            "put": {
+                "description": "Updates a movie with the given ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Movies"
+                ],
+                "summary": "Update movie by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Movie ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Movie information to update",
+                        "name": "movie",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/MovieService_internal_models.Movie"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/movies": {
+            "get": {
+                "description": "Retrieves a list of movies based on the provided parameters",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Movies"
+                ],
+                "summary": "Get list of movies",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Query string to sort movies",
+                        "name": "sorting",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/MovieService_internal_models.Movie"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "post": {
+                "description": "Add a new movie with name, description, release date, rating",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Movies"
+                ],
+                "summary": "Add a new movie",
+                "parameters": [
+                    {
+                        "description": "Movie information",
+                        "name": "movie",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/MovieService_internal_models.Movie"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/movies/search": {
+            "get": {
+                "description": "Retrieves a list of movies based on the provided parameters",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Movies"
+                ],
+                "summary": "Get list of movies",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Name of movie to filter movies",
+                        "name": "movie_name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Name of actor to filter movies",
+                        "name": "actor_name",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/MovieService_internal_models.Movie"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/movies/{id}": {
+            "delete": {
+                "description": "Deletes a movie with the given ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Movies"
+                ],
+                "summary": "Delete movie by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Movie ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/movies/{id}/actors": {
+            "post": {
+                "description": "Add an actor to movie by their ids",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Movies"
+                ],
+                "summary": "Add an actor to movie",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Movie ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Actor id",
+                        "name": "id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/movies/{movieId}/actors/{actorId}": {
+            "delete": {
+                "description": "Delete actor from movie by their ids",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Movies"
+                ],
+                "summary": "Delete actor from movie",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Movie ID",
+                        "name": "movieId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Actor id",
+                        "name": "actorId",
                         "in": "path",
                         "required": true
                     }
@@ -226,6 +508,52 @@ const docTemplate = `{
                 },
                 "surname": {
                     "type": "string"
+                }
+            }
+        },
+        "MovieService_internal_models.ActorInMovieSlice": {
+            "type": "object",
+            "properties": {
+                "birthDate": {
+                    "$ref": "#/definitions/pgtype.Date"
+                },
+                "gender": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "surname": {
+                    "type": "string"
+                }
+            }
+        },
+        "MovieService_internal_models.Movie": {
+            "type": "object",
+            "properties": {
+                "actors": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/MovieService_internal_models.ActorInMovieSlice"
+                    }
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "rating": {
+                    "type": "integer"
+                },
+                "releaseDate": {
+                    "$ref": "#/definitions/pgtype.Date"
                 }
             }
         },
