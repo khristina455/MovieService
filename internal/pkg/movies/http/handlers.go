@@ -12,14 +12,17 @@ import (
 	"path/filepath"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 var (
-	allMoviesRe      = regexp.MustCompile(`^\/api\/movies((\?.*)|(\/*))$`)
-	moviesBySearchRe = regexp.MustCompile(`^\/api\/movies\/search\?.*$`)
-	addMovieRe       = regexp.MustCompile(`^\/api\/movies[\/]*$`)
-	updateMovieRe    = regexp.MustCompile(`^\/api\/movies\/(\d+)$`)
-	deleteMovieRe    = regexp.MustCompile(`^\/api\/movies\/(\d+)$`)
+	allMoviesRe            = regexp.MustCompile(`^\/api\/movies((\?.*)|(\/*))$`)
+	moviesBySearchRe       = regexp.MustCompile(`^\/api\/movies\/search\?.*$`)
+	addMovieRe             = regexp.MustCompile(`^\/api\/movies[\/]*$`)
+	updateMovieRe          = regexp.MustCompile(`^\/api\/movies\/(\d+)$`)
+	deleteMovieRe          = regexp.MustCompile(`^\/api\/movies\/(\d+)$`)
+	deleteActorFromMovieRe = regexp.MustCompile(`^\/api\/movies\/(\d+)\/actors[\/]*$`)
+	addActorToMovieRe      = regexp.MustCompile(`^\/api\/movies\/(\d+)\/actors[\/]*$`)
 )
 
 type MoviesHandler struct {
@@ -54,8 +57,13 @@ func (mh *MoviesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case r.Method == http.MethodDelete && deleteMovieRe.MatchString(r.URL.RequestURI()):
 		mh.DeleteMovie(w, r)
 		return
-	default:
+	case r.Method == http.MethodPost && addActorToMovieRe.MatchString(r.URL.Path):
+		mh.AddActorToMovie(w, r)
 		return
+	case r.Method == http.MethodDelete && deleteActorFromMovieRe.MatchString(r.URL.Path):
+		mh.DeleteActorToMovie(w, r)
+	default:
+		resp.JSONStatus(w, http.StatusNotFound)
 	}
 }
 
@@ -169,4 +177,39 @@ func (mh *MoviesHandler) DeleteMovie(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp.JSONStatus(w, http.StatusOK)
+}
+
+func (mh *MoviesHandler) AddActorToMovie(w http.ResponseWriter, r *http.Request) {
+	sliceOfURL := strings.Split(r.URL.Path, "/")
+	id, err := strconv.Atoi(sliceOfURL[1])
+	if err != nil {
+		resp.JSONStatus(w, http.StatusBadRequest)
+		return
+	}
+
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		resp.JSONStatus(w, http.StatusBadRequest)
+		return
+	}
+
+	m := make(map[string]interface{})
+	err = json.Unmarshal(body, &m)
+	if err != nil {
+		resp.JSONStatus(w, http.StatusBadRequest)
+		return
+	}
+
+	actorId := m["id"].(int)
+	err = mh.uc.AddActorToMovie(r.Context(), id, actorId)
+	if err != nil {
+		resp.JSONStatus(w, http.StatusInternalServerError)
+		return
+	}
+
+	resp.JSONStatus(w, http.StatusOK)
+}
+
+func (mh *MoviesHandler) DeleteActorToMovie(w http.ResponseWriter, r *http.Request) {
+
 }

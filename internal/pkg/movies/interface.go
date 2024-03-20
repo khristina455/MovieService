@@ -23,6 +23,7 @@ type MoviesRepo interface {
 	ReadMoviesByMovieName(context.Context, string) ([]models.Movie, error)
 	ReadMoviesByActorName(context.Context, string) ([]models.Movie, error)
 	AddActorToMovie(context.Context, int, int) error
+	DeleteActorFromMovie(context.Context, int, int) error
 }
 
 type MoviesUsecase interface {
@@ -32,4 +33,6 @@ type MoviesUsecase interface {
 	DeleteMovie(context.Context, int) error
 	GetMoviesByMovieName(context.Context, string) ([]models.Movie, error)
 	GetMoviesByActorName(context.Context, string) ([]models.Movie, error)
+	AddActorToMovie(context.Context, int, int) error
+	DeleteActorFromMovie(context.Context, int, int) error
 }

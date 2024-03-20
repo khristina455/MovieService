@@ -18,7 +18,8 @@ const (
 	updateMovie           = "UPDATE movie SET name=$1, description=$2, release_date=$3, rating=$4 WHERE id=$5;"
 	deleteMovie           = "DELETE FROM movie WHERE id=$1;"
 	readActorsOfMovie     = "SELECT a.id, a.name, a.surname, a.gender, a.birth_date FROM actor AS a JOIN movie_actor AS ma ON ma.actor_id = a.id WHERE ma.movie_id=$1"
-	createActorMovie      = "INSERT INTO movie_actor (movie_id, actor_id) VALUES ($1, $2)"
+	createActorMovie      = "INSERT INTO movie_actor (movie_id, actor_id) VALUES ($1, $2);"
+	deleteActorMovie      = "DELETE FROM movie_actor WHERE movie_id=$1 AND actor_id=$2;"
 	readMoviesActorName   = "SELECT m.id, m.name, m.description, m.release_date, m.rating FROM movie AS m " +
 		"JOIN movie_actor AS ma ON m.id=ma.movie_id " +
 		"JOIN actor AS a ON ma.actor_id=a.id WHERE LOWER(a.name) LIKE LOWER($1) OR a.surname LIKE $1;"
@@ -176,18 +177,6 @@ func (mr *MoviesRepo) DeleteMovie(ctx context.Context, id int) error {
 	return nil
 }
 
-func (mr *MoviesRepo) AddActorToMovie(ctx context.Context, movieId int, actorId int) error {
-	_, err := mr.db.Exec(ctx, createActorMovie, movieId, actorId)
-
-	if err != nil {
-		err = fmt.Errorf("error happened in db.Exec: %w", err)
-
-		return err
-	}
-
-	return nil
-}
-
 func (mr *MoviesRepo) ReadMoviesByMovieName(ctx context.Context, movieName string) ([]models.Movie, error) {
 	movieSlice := make([]models.Movie, 0)
 	movieName = "%" + movieName + "%"
@@ -263,4 +252,28 @@ func (mr *MoviesRepo) ReadMoviesByActorName(ctx context.Context, actorName strin
 	defer rows.Close()
 
 	return movieSlice, err
+}
+
+func (mr *MoviesRepo) AddActorToMovie(ctx context.Context, movieId int, actorId int) error {
+	_, err := mr.db.Exec(ctx, createActorMovie, movieId, actorId)
+
+	if err != nil {
+		err = fmt.Errorf("error happened in db.Exec: %w", err)
+
+		return err
+	}
+
+	return nil
+}
+
+func (mr *MoviesRepo) DeleteActorFromMovie(ctx context.Context, movieId int, actorId int) error {
+	_, err := mr.db.Exec(ctx, deleteActorMovie, movieId, actorId)
+
+	if err != nil {
+		err = fmt.Errorf("error happened in db.Exec: %w", err)
+
+		return err
+	}
+
+	return nil
 }

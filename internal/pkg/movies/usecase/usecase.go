@@ -79,3 +79,13 @@ func (mu MoviesUsecase) GetMoviesByActorName(ctx context.Context, s string) ([]m
 	m, err := mu.repo.ReadMoviesByActorName(ctx, s)
 	return m, err
 }
+
+func (mu MoviesUsecase) AddActorToMovie(ctx context.Context, movieId int, actorId int) error {
+	err := mu.repo.AddActorToMovie(ctx, movieId, actorId)
+	return err
+}
+
+func (mu MoviesUsecase) DeleteActorFromMovie(ctx context.Context, movieId int, actorId int) error {
+	err := mu.repo.DeleteActorFromMovie(ctx, movieId, actorId)
+	return err
+}
