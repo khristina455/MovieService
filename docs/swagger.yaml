@@ -1,0 +1,30 @@
+basePath: /
+host: localhost:8080
+info:
+  contact: {}
+  description: Api for movie db
+  title: MovieService
+  version: "1.0"
+paths:
+  /api/actors:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a list of all actors
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get list of actors
+      tags:
+      - Actors
+schemes:
+- http
+swagger: "2.0"

@@ -25,16 +25,20 @@ import (
 )
 
 // Логгер
-// JWT и Роли
 // Swagger
 
+// @title MovieService
+// @version 1.0
+// @description Api for movie db
+
+// @host localhost:8080
+// @schemes http
+// @BasePath /
 func main() {
 	if err := run(); err != nil {
 		os.Exit(1)
 	}
 }
-
-var tokenManager jwt.TokenManager
 
 func run() (err error) {
 	if err := godotenv.Load(); err != nil {

@@ -56,6 +56,15 @@ func (ah *ActorsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// GetActors godoc
+// @Summary      Get list of actors
+// @Description  Retrieves a list of all actors
+// @Tags         Actors
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  map[string]any
+// @Failure      500  {object}  error
+// @Router       /api/actors [get]
 func (ah *ActorsHandler) GetActors(w http.ResponseWriter, r *http.Request) {
 	actors, err := ah.uc.GetActors(r.Context())
 	fmt.Println("get actors")
