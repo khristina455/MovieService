@@ -70,7 +70,12 @@ func (mu MoviesUsecase) DeleteMovie(ctx context.Context, id int) error {
 	return err
 }
 
-func (mu MoviesUsecase) GetMoviesBySearch(ctx context.Context, movieName string, actorName string) ([]models.Movie, error) {
-	m, err := mu.repo.ReadMoviesBySearch(ctx, movieName, actorName)
+func (mu MoviesUsecase) GetMoviesByMovieName(ctx context.Context, s string) ([]models.Movie, error) {
+	m, err := mu.repo.ReadMoviesByMovieName(ctx, s)
+	return m, err
+}
+
+func (mu MoviesUsecase) GetMoviesByActorName(ctx context.Context, s string) ([]models.Movie, error) {
+	m, err := mu.repo.ReadMoviesByActorName(ctx, s)
 	return m, err
 }

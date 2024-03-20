@@ -20,7 +20,8 @@ type MoviesRepo interface {
 	CreateMovie(context.Context, *models.Movie) (int, error)
 	UpdateMovie(context.Context, *models.Movie) error
 	DeleteMovie(context.Context, int) error
-	ReadMoviesBySearch(context.Context, string, string) ([]models.Movie, error)
+	ReadMoviesByMovieName(context.Context, string) ([]models.Movie, error)
+	ReadMoviesByActorName(context.Context, string) ([]models.Movie, error)
 	AddActorToMovie(context.Context, int, int) error
 }
 
@@ -29,5 +30,6 @@ type MoviesUsecase interface {
 	AddMovie(context.Context, *models.Movie) error
 	UpdateMovie(context.Context, *models.Movie) error
 	DeleteMovie(context.Context, int) error
-	GetMoviesBySearch(context.Context, string, string) ([]models.Movie, error)
+	GetMoviesByMovieName(context.Context, string) ([]models.Movie, error)
+	GetMoviesByActorName(context.Context, string) ([]models.Movie, error)
 }

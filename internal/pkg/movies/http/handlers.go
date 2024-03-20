@@ -82,13 +82,24 @@ func (mh *MoviesHandler) GetMoviesBySearch(w http.ResponseWriter, r *http.Reques
 	movieName := r.URL.Query().Get("movie_name")
 	actorName := r.URL.Query().Get("actor_name")
 
-	movies, err := mh.uc.GetMoviesBySearch(r.Context(), movieName, actorName)
-	if err != nil {
-		resp.JSONStatus(w, http.StatusInternalServerError)
-		return
+	if movieName != "" && actorName == "" {
+		movies, err := mh.uc.GetMoviesByMovieName(r.Context(), movieName)
+		if err != nil {
+			resp.JSONStatus(w, http.StatusInternalServerError)
+			return
+		}
+		resp.JSON(w, http.StatusOK, movies)
+	} else if movieName == "" && actorName != "" {
+		movies, err := mh.uc.GetMoviesByActorName(r.Context(), actorName)
+		fmt.Println(err)
+		if err != nil {
+			resp.JSONStatus(w, http.StatusInternalServerError)
+			return
+		}
+		resp.JSON(w, http.StatusOK, movies)
+	} else {
+		resp.JSONStatus(w, http.StatusBadRequest)
 	}
-
-	resp.JSON(w, http.StatusOK, movies)
 }
 
 func (mh *MoviesHandler) AddMovie(w http.ResponseWriter, r *http.Request) {
