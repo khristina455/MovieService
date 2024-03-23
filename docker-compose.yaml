@@ -1,0 +1,29 @@
+version: "3.8"
+services:
+  api:
+    build: .
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    command: go run cmd/main.go
+    depends_on:
+      postgres:
+        condition: service_started
+
+  postgres:
+    env_file:
+      - .env
+    image: postgres:15
+    container_name: postgres
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/initdb.sql
+    restart: always

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
-	"log"
 	"log/slog"
 	"net/http"
 	"os"
@@ -36,13 +35,14 @@ import (
 // @BasePath /
 func main() {
 	if err := run(); err != nil {
+		fmt.Println(err)
 		os.Exit(1)
 	}
 }
 
 func run() (err error) {
 	if err := godotenv.Load(); err != nil {
-		log.Fatal("Не удалось загрузить файл .env")
+		fmt.Println("Не удалось загрузить файл .env")
 		return err
 	}
 
@@ -74,6 +74,7 @@ func run() (err error) {
 
 	err = jwt.LoadSecret(secretKey)
 	if err != nil {
+		fmt.Println("загрузка секрета")
 		return err
 	}
 
